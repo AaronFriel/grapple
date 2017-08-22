@@ -1,0 +1,23 @@
+[package]
+name = "grapple"
+version = "0.1.0"
+authors = ["Aaron Friel <mayreply@aaronfriel.com>"]
+license = "BSD"
+
+[dependencies]
+rocket = "0.3.1"
+# rocket_codegen = "0.3.1"
+# rocket_codegen = "*"
+rocket_codegen = { git = "https://github.com/SergioBenitez/Rocket.git", rev = "944736208e3752338d38ac974a68dfc50c82ae2f" }
+rocket_contrib = "*"
+serde = "^1.0"
+serde_derive = "^1.0"
+serde_json = "^1.0"
+serde_yaml = "0.7.*"
+data-encoding = "^1.2.0"
+github_webhook_message_validator = "*"
+error-chain = "0.10.*"
+clippy = {version = "*", optional = true}
+
+[features]
+default = []
