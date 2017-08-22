@@ -1,7 +1,5 @@
 use github::commit::Commit;
-use github::a_repository::Repository;
-// use github::repo::Repository;
-// use github::repo::Repository;
+use github::repository::Repository;
 
 #[derive(Deserialize, Debug)]
 pub struct PushEvent {
@@ -18,5 +16,5 @@ pub struct PushEvent {
 
     commits: Vec<Commit>,
 
-    // repository: Repository,
+    repository: Repository,
 }
