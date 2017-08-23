@@ -1,4 +1,5 @@
 #![feature(plugin, custom_derive)]
+#![feature(try_trait)]
 #![plugin(rocket_codegen)]
 
 #[macro_use] extern crate error_chain;
@@ -9,15 +10,16 @@ extern crate serde;
 #[macro_use] extern crate serde_derive;
 extern crate serde_json;
 extern crate serde_yaml;
+extern crate git2;
 
 pub mod webhook;
 pub mod config;
-pub mod has_repository;
+pub mod git_repository;
 pub mod github;
 pub mod errors;
 
 use rocket::State;
-use rocket_contrib::{Json};
+use rocket::response::status::{Accepted};
 
 use github::push_event::PushEvent;
 use config::Config;
@@ -28,14 +30,16 @@ use errors::*;
 
 use webhook::Webhook;
 
+use git2::Repository;
+
 #[get("/")]
 fn index() -> &'static str {
     "Hello, world!"
 }
 
-#[post("/push", data = "<_pushevent>")]
-fn push<'r>(_pushevent: Webhook<Json<PushEvent>>, _config: State<'r, Config>) {
-    return;
+#[post("/push", data = "<pushevent>")]
+fn push<'r>(pushevent: Webhook<PushEvent>) -> Accepted<()> {
+    Accepted(Some(()))
 }
 
 fn main() {

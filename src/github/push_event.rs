@@ -1,6 +1,8 @@
 use github::commit::Commit;
 use github::repository::Repository;
 
+use git_repository::GitRepository;
+
 #[derive(Deserialize, Debug)]
 pub struct PushEvent {
     #[serde(rename = "ref")]
@@ -18,3 +20,10 @@ pub struct PushEvent {
 
     repository: Repository,
 }
+
+impl GitRepository for PushEvent {
+    fn name(&self) -> &str {
+        self.repository.name()
+    }
+}
+

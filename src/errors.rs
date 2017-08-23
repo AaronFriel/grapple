@@ -1,3 +1,5 @@
+#![allow(unused_doc_comment)]
+
 error_chain! {
     types{
         Error, ErrorKind, ResultExt, Result;
@@ -6,8 +8,6 @@ error_chain! {
     foreign_links {
     }
     errors {
-
-        //
         ConfigurationError(errs: Vec<Error>) {
             description("configuration file not loaded")
             display("configuration file not loaded, errors:\n{:?}", errs)
@@ -18,19 +18,8 @@ error_chain! {
             display("failed to load configuration file '{}'", f)
         }
 
-        //
         ConfigParseError {
             description("error parsing configuration file")
         }
     }
 }
-
-
-        // ConfigurationError(t: Vec<Error>) {
-        //     description("no configuration file loaded"),
-        //     display("errors loading possible configurations:\n{}", t)
-        // }
-
-
-        // SerdeYaml(::serde_yaml::Error);
-        // SerdeJson(::serde_json::Error);

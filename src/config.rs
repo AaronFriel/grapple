@@ -5,8 +5,8 @@ pub struct Config {
 
 #[derive(Debug,Deserialize)]
 pub struct RepositoryMapping {
-    from: String,
-    to: String,
-    secret: Vec<u8>,
+    pub from: String,
+    pub to: String,
+    pub secret: Vec<u8>,
 }
 

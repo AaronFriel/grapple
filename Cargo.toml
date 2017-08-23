@@ -17,6 +17,7 @@ serde_yaml = "0.7.*"
 data-encoding = "^1.2.0"
 github_webhook_message_validator = "*"
 error-chain = "0.10.*"
+git2 = "0.6.*"
 clippy = {version = "*", optional = true}
 
 [features]
