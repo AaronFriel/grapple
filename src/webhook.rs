@@ -32,7 +32,7 @@ use config::Config;
 
 use git_repository::GitRepository;
 
-pub struct Webhook<T> (pub T, pub RepositoryMapping);
+pub struct Webhook<T> (pub T);
 
 const LIMIT: u64 = 0x50_000;
 
