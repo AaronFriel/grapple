@@ -18,10 +18,6 @@ pub mod git_repository;
 pub mod github;
 pub mod errors;
 
-use rocket::State;
-use rocket::response::status::{Accepted};
-
-use github::push_event::PushEvent;
 use config::Config;
 
 use std::fs::File;
@@ -30,16 +26,22 @@ use errors::*;
 
 use webhook::Webhook;
 
-use git2::Repository;
+use git_repository::GitRepository;
 
 #[get("/")]
 fn index() -> &'static str {
     "Hello, world!"
 }
 
-#[post("/push", data = "<pushevent>")]
-fn push<'r>(pushevent: Webhook<PushEvent>) -> Accepted<()> {
-    Accepted(Some(()))
+#[post("/github", data = "<webhook>", rank = 0)]
+fn github<'r>(webhook: Webhook<github::Event>) -> Result<()> {
+    match git_repository::grapple(&webhook.value, &webhook.value.clone_uri(), &webhook.mapping.push_uri, &webhook.mapping.deploy_key) {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            println!("{}", e);
+            Err(e)
+        }
+    }
 }
 
 fn main() {
@@ -52,7 +54,7 @@ fn main() {
     };
 
     rocket::ignite()
-        .mount("/", routes![index, push])
+        .mount("/", routes![index, github])
         .manage(config)
         .launch();
 }
@@ -62,19 +64,16 @@ fn load_config() -> Result<Config> {
 
     match load_config_json() {
         Ok(config) => return Ok(config),
-        // Err(Error(NoConfiguration, _)) => (),
         Err(e) => errs.push(e),
     }
 
     match load_config_yaml() {
         Ok(config) => return Ok(config),
-        // Err(Error(NoConfiguration, _)) => (),
         Err(e) => errs.push(e),
     }
     Err(Error::from_kind(ErrorKind::ConfigurationError(errs)))
 }
 static CONFIG_YAML: &'static str = "config.yaml";
-
 
 fn load_config_yaml() -> Result<Config> {
     let mut file = File::open(CONFIG_YAML).chain_err(|| ErrorKind::ConfigFileError(CONFIG_YAML.to_string()))?;

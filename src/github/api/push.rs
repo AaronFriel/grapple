@@ -1,5 +1,5 @@
-use github::commit::Commit;
-use github::repository::Repository;
+use github::api::commit::Commit;
+use github::api::repository::Repository;
 
 use git_repository::GitRepository;
 
@@ -22,8 +22,12 @@ pub struct PushEvent {
 }
 
 impl GitRepository for PushEvent {
-    fn name(&self) -> &str {
-        self.repository.name()
+    fn repository_name(&self) -> &str {
+        self.repository.repository_name()
+    }
+
+    fn clone_uri(&self) -> &str {
+        self.repository.clone_uri()
     }
 }
 
