@@ -48,7 +48,7 @@ error_chain! {
             description("could not find mapping for webhook received")
         }
 
-        SignatureHeaderError {
+        SignatureHeaderError(err: Option<::hex::FromHexError>) {
             description("could not find signature header for webhook received")
         }
 
@@ -69,7 +69,6 @@ error_chain! {
 impl ::std::convert::From<git2::Error> for Error {
     fn from(git_err: git2::Error) -> Error {
         Error::from_kind(ErrorKind::RepositoryGitError(git_err))
-        // unimplemented!()
     }
 }
 

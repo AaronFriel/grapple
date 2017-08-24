@@ -1,38 +1,22 @@
 extern crate github_webhook_message_validator;
 
-// use rocket::Outcome;
-// use rocket::http::Status;
-// use rocket::request::{self, Request, FromRequest};
-use std::io::{self, Read};
+use std::convert::From;
+use std::io::Read;
 use std::ops::Try;
 
-use self::github_webhook_message_validator::validate;
-
-use rocket::outcome::{Outcome, IntoOutcome};
-use rocket::request::{Request, FromRequest};
+use hex;
 use rocket::data::{self, Data, FromData};
 use rocket::http::Status;
+use rocket::outcome::{Outcome, IntoOutcome};
+use rocket::request::{Request, FromRequest};
 use rocket::{State};
-// // use rocket::data::DataStream;
-// use rocket::Outcome::{Outcome, IntoOutcome};
-// // use rocket::data::{self, Data, FromData};
-// use rocket::data::{self, Data, FromData};
-// use rocket::http::{Status};
-// use rocket::request::Request;
-// // use rocket::request::{FromRequest};
-// use rocket::response::{self, Responder, content};
-// // use rocket::{State, Request, Data};
-
-// use rocket_contrib::{Json};
+use self::github_webhook_message_validator::validate;
 use serde::de::DeserializeOwned;
-
 use serde_json;
 
 use config::{Config, RepositoryMapping};
-
-use git_repository::GitRepository;
-
 use errors::*;
+use git_repository::GitRepository;
 
 pub struct Webhook<T> {
     pub value: T,
@@ -46,13 +30,10 @@ impl<T: DeserializeOwned + GitRepository> FromData for Webhook<T>
     type Error = Error;
 
     fn from_data(request: &Request, data: Data) -> data::Outcome<Self, Self::Error> {
-        let mut u = 0;
-
         let config = State::<Config>::from_request(request)
             .into_result()
             .map_err(|_| Error::from_kind(ErrorKind::ConfigurationNotAvailable))
             .into_outcome(Status::BadRequest)?;
-
 
         if !request.content_type().map_or(false, |ct| ct.is_json()) {
             return Outcome::Forward(data);
@@ -62,56 +43,37 @@ impl<T: DeserializeOwned + GitRepository> FromData for Webhook<T>
 
         let mut payload = Vec::new();
 
-        let len = data.stream_to(&mut payload);
-
+        data.open().take(size_limit).read_to_end(&mut payload)
+            .map_err(|e| Error::from_kind(ErrorKind::PayloadReadError(e)))
+            .into_outcome(Status::BadRequest)?;
 
         let json: T = serde_json::from_slice(payload.as_slice())
             .map_err(|e| Error::from_kind(ErrorKind::PayloadParseError(e)))
             .into_outcome(Status::BadRequest)?;
 
-
         let mapping = {
             let repo = json.repository_name();
-
 
             let mapping = config.mappings.iter().find(|m| m.from == repo)
                 .ok_or(Error::from_kind(ErrorKind::MappingLookupError))
                 .into_outcome(Status::BadRequest)?;
 
-
             let secret = mapping.secret.as_bytes();
-            // let signature = request.headers().get_one("X-Hub-Signature")
-            //     .ok_or(Error::from_kind(ErrorKind::SignatureHeaderError))
-            //     .into_outcome(Status::BadRequest)?;
-            let signature = &vec![
-                0xcd,
-                0x23,
-                0x57,
-                0x71,
-                0x26,
-                0xe9,
-                0x1e,
-                0x53,
-                0x14,
-                0x3e,
-                0xb6,
-                0x19,
-                0xd9,
-                0xa2,
-                0x29,
-                0x98,
-                0x4c,
-                0x72,
-                0xcb,
-                0x59,
-            ];
 
+            let signature = request.headers().get_one("X-Hub-Signature")
+                .ok_or(Error::from_kind(ErrorKind::SignatureHeaderError(None)))
+                .into_outcome(Status::BadRequest)?;
 
-            if !validate(secret,&signature,&payload) {
-                println!("Error validating.");
+            let sig_vec: Vec<u8> = From::from(signature[5..].as_bytes());
+
+            // skip the "sha1="
+            let signature_sha: Vec<u8> = hex::FromHex::from_hex(sig_vec)
+                .map_err(|e| Error::from_kind(ErrorKind::SignatureHeaderError(Some(e))))
+                .into_outcome(Status::BadRequest)?;
+
+            if !validate(secret,&signature_sha,&payload) {
                 return Outcome::Failure((Status::BadRequest, Error::from_kind(ErrorKind::ValidationError)))
             }
-
 
             mapping
         };

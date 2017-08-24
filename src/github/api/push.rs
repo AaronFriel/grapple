@@ -8,13 +8,17 @@ pub struct PushEvent {
     #[serde(rename = "ref")]
     git_ref: String,
 
-    head: String,
-
     before: String,
 
-    size: i64,
+    after: String,
 
-    distinct_size: i64,
+    created: bool,
+
+    deleted: bool,
+
+    forced: bool,
+
+    compare: String,
 
     commits: Vec<Commit>,
 

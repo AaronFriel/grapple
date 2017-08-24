@@ -11,6 +11,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate serde_yaml;
 extern crate git2;
+extern crate hex;
 
 pub mod webhook;
 pub mod config;
@@ -26,8 +27,6 @@ use errors::*;
 
 use webhook::Webhook;
 
-use git_repository::GitRepository;
-
 #[get("/")]
 fn index() -> &'static str {
     "Hello, world!"
@@ -35,7 +34,7 @@ fn index() -> &'static str {
 
 #[post("/github", data = "<webhook>", rank = 0)]
 fn github<'r>(webhook: Webhook<github::Event>) -> Result<()> {
-    match git_repository::grapple(&webhook.value, &webhook.value.clone_uri(), &webhook.mapping.push_uri, &webhook.mapping.deploy_key) {
+    match git_repository::grapple(&webhook.value, &webhook.mapping) {
         Ok(()) => Ok(()),
         Err(e) => {
             println!("{}", e);

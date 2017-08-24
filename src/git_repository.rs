@@ -3,7 +3,8 @@ use errors::*;
 use git2::{Repository, PushOptions, RemoteCallbacks, Cred};
 use std::path::{Path};
 use std::fs::{self};
-use std;
+
+use config::RepositoryMapping;
 
 const ATTEMPTS: u8 = 3;
 
@@ -43,32 +44,28 @@ fn attempt_open<T: GitRepository>(repo: &T, attempts: u8) -> Result<Repository> 
     Ok(Repository::clone(repo.clone_uri(), path)?)
 }
 
-pub fn grapple<T: GitRepository>(repo: &T, pull_from_uri: &str, push_to_uri: &str, deploy_key: &str) -> Result<()> {
-    let repo = open(repo)?;
+pub fn grapple<T: GitRepository>(payload: &T, mapping: &RepositoryMapping) -> Result<()> {
+    let repo = open(payload)?;
 
-    let mut from_remote = repo.remote_anonymous(pull_from_uri)
-        .map_err(|e| {println!("{}", e); e})?;
+    let mut from_remote = repo.remote_anonymous(payload.clone_uri())?;
 
-    from_remote.fetch(&[], None, None)
-        .map_err(|e| {println!("{}", e); e})?;
+    from_remote.fetch(&[], None, None)?;
 
-    let mut to_remote = repo.remote_anonymous(push_to_uri)
-        .map_err(|e| {println!("{}", e); e})?;
+    let mut to_remote = repo.remote_anonymous(&mapping.push_uri)?;
 
     let mut callbacks = RemoteCallbacks::new();
     callbacks.credentials(
         |_, username, _| Cred::ssh_key(
             username.unwrap_or("grapple"),
-            Some(Path::new("/zfsdev/volumes/devhome/.ssh/aelve_rsa.pub")),
-            Path::new("/zfsdev/volumes/devhome/.ssh/aelve_rsa"),
+            Some(Path::new(&mapping.deploy_public_key)),
+            Path::new(&mapping.deploy_private_key),
             None));
 
-    let mut pushOptions = PushOptions::new();
+    let mut push_options = PushOptions::new();
 
-    pushOptions.remote_callbacks(callbacks);
+    push_options.remote_callbacks(callbacks);
 
-    to_remote.push(&[], Some(&mut pushOptions))
-        .map_err(|e| {println!("{}", e); e})?;
+    to_remote.push(&[], Some(&mut push_options))?;
 
     Ok(())
 }

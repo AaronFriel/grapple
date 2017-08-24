@@ -1,14 +1,17 @@
 #[derive(Deserialize, Debug)]
 pub struct Commit {
-    sha: String,
-    message: String,
-    author: CommitAuthor,
-    url: String,
+    id: String,
+    tree_id: String,
     distinct: bool,
+    message: String,
+    url: String,
+    author: CommitAuthor,
+    committer: CommitAuthor,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct CommitAuthor {
-    author: String,
+    name: String,
     email: String,
+    username: String,
 }
