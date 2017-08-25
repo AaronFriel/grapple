@@ -23,7 +23,7 @@ This will produce the executable in `target/release/grapple`. The Dockerfile in 
 ## Docker image/running Grapple
 
 A recent docker image is hosted at this registry address:
-`registry.gitlab.frielforreal.com/AaronFriel/grapple`. Run with:
+`registry.gitlab.frielforreal.com/friel/grapple`. Run with:
 
 ```
 ROCKET_CONFIG_PATH="/var/lib/grapple"
@@ -34,7 +34,7 @@ docker run --name grapple --restart=unless-stopped \
     -e ROCKET_ENV=stage \
     -e ROCKET_PORT=80 \
     -p ${ROCKET_PORT}:80/tcp \
-    -d registry.gitlab.frielforreal.com/AaronFriel/grapple grapple
+    -d registry.gitlab.frielforreal.com/friel/grapple grapple
 ```
 
 The server will listen at `0.0.0.0/github` for webhooks. Verify the server is running with `docker logs`.
