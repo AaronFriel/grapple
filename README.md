@@ -23,7 +23,7 @@ This will produce the executable in `target/release/grapple`. The Dockerfile in 
 ## Docker image/running Grapple
 
 A recent docker image is hosted at this registry address:
-`registry.gitlab.frielforreal.com/aelve/grapple`. Run with:
+`registry.gitlab.frielforreal.com/AaronFriel/grapple`. Run with:
 
 ```
 ROCKET_CONFIG_PATH="/var/lib/grapple"
@@ -34,7 +34,7 @@ docker run --name grapple --restart=unless-stopped \
     -e ROCKET_ENV=stage \
     -e ROCKET_PORT=80 \
     -p ${ROCKET_PORT}:80/tcp \
-    -d registry.gitlab.frielforreal.com/aelve/grapple grapple
+    -d registry.gitlab.frielforreal.com/AaronFriel/grapple grapple
 ```
 
 The server will listen at `0.0.0.0/github` for webhooks. Verify the server is running with `docker logs`.
@@ -47,17 +47,17 @@ Grapple supports `yaml` and `json` configuration formats. A sample file would lo
 {
     "mappings": [
         {
-            "from": "aelve/guide",
-            "push_uri": "ssh://git@gitlab.frielforreal.com:58432/aelve/guide.git",
-            "deploy_public_key": "/var/lib/grapple/aelve_rsa.pub",
-            "deploy_private_key": "/var/lib/grapple/aelve_rsa",
+            "from": "AaronFriel/guide",
+            "push_uri": "ssh://git@gitlab.frielforreal.com:58432/AaronFriel/grapple.git",
+            "deploy_public_key": "/var/lib/grapple/AaronFriel_rsa.pub",
+            "deploy_private_key": "/var/lib/grapple/AaronFriel_rsa",
             "secret": "SECRET HERE"
         }
     ]
 }
 ```
 
-This config file listens for GitHub webhooks from the repository `aelve/guide`, and pushes them to my gitlab server. The SSH keys should be deploy keys or otherwise access-limited keys that can only push to the repository of your choice. (Not that I think Grapple is insecure, but these are best practices.) The secret should be the GitHub WebHook secret, which is used to validate the incoming requests.
+This config file listens for GitHub webhooks from the repository `AaronFriel/guide`, and pushes them to my gitlab server. The SSH keys should be deploy keys or otherwise access-limited keys that can only push to the repository of your choice. (Not that I think Grapple is insecure, but these are best practices.) The secret should be the GitHub WebHook secret, which is used to validate the incoming requests.
 
 ## What if something breaks?
 
