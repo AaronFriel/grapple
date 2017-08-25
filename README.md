@@ -6,7 +6,7 @@ Grapple is a tool for mirroring a GitHub based repository by listening for webho
 
 ## Installing
 
-Grapple relies on features in nightly builds. Using [rustup](https://www.rustup.rs/), use a recent nightly build, e.g.::
+Grapple relies on features in nightly builds. Using [rustup](https://www.rustup.rs/), use a recent nightly build, e.g.:
 
 ```
 rustup default nightly-2017-08-22
@@ -20,7 +20,7 @@ cargo build --release
 
 This will produce the executable in `target/release/grapple`. The Dockerfile in `./docker` can help you spin it up as a webserver if you copy the release binary into the docker folder.
 
-## Docker image
+## Docker image/running Grapple
 
 A recent docker image is hosted at this registry address:
 `registry.gitlab.frielforreal.com/aelve/grapple`. Run with:
@@ -35,7 +35,9 @@ docker run --name grapple --restart=unless-stopped \
     -e ROCKET_PORT=80 \
     -p ${ROCKET_PORT}:80/tcp \
     -d registry.gitlab.frielforreal.com/aelve/grapple grapple
-```
+``
+
+The server will listen at `0.0.0.0/github` for webhooks. Verify the server is running with `docker logs`.
 
 ## Configuration
 
