@@ -35,7 +35,7 @@ docker run --name grapple --restart=unless-stopped \
     -e ROCKET_PORT=80 \
     -p ${ROCKET_PORT}:80/tcp \
     -d registry.gitlab.frielforreal.com/aelve/grapple grapple
-``
+```
 
 The server will listen at `0.0.0.0/github` for webhooks. Verify the server is running with `docker logs`.
 
