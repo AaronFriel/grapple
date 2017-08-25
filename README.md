@@ -41,9 +41,9 @@ The server will listen at `0.0.0.0/github` for webhooks. Verify the server is ru
 
 ## Configuration
 
-Grapple supports `yaml` and `json` configuration formats. A sample file would look like:
+Grapple supports `yaml` and `json` configuration formats. A sample file would look like this `config.json`:
 
-```
+```json
 {
     "mappings": [
         {
@@ -57,7 +57,18 @@ Grapple supports `yaml` and `json` configuration formats. A sample file would lo
 }
 ```
 
-This config file listens for GitHub webhooks from the repository `AaronFriel/grapple`, and pushes them to my gitlab server. The SSH keys should be deploy keys or otherwise access-limited keys that can only push to the repository of your choice. (Not that I think Grapple is insecure, but these are best practices.) The secret should be the GitHub WebHook secret, which is used to validate the incoming requests.
+With this config, Grapple listens for GitHub webhooks from the repository `AaronFriel/grapple`, and pushes them to my gitlab server. The SSH keys should be deploy keys or otherwise access-limited keys that can only push to the repository of your choice. (Not that I think Grapple is insecure, but these are best practices.) The secret should be the GitHub WebHook secret, which is used to validate the incoming requests.
+
+The config file can be either `config.json` or `config.yaml`. A yaml configuration would look like this:
+
+```yaml
+mappings:
+  - from: AaronFriel/grapple
+    push_uri: ssh://git@gitlab.frielforreal.com:58432/AaronFriel/grapple.git
+    deploy_public_key: /var/lib/grapple/AaronFriel_rsa.pub
+    deploy_private_key: /var/lib/grapple/AaronFriel_rsa
+    secret: SECRET HERE
+```
 
 ## What if something breaks?
 
