@@ -62,6 +62,7 @@ error_chain! {
 
         RepositoryGitError(e: git2::Error) {
             description("error running git commands on repository")
+            display("error running git commands on repository '{}'", e)
         }
     }
 }

@@ -1,31 +1,20 @@
 #![feature(plugin, custom_derive)]
-#![feature(try_trait)]
 #![plugin(rocket_codegen)]
 
-#[macro_use] extern crate error_chain;
+extern crate grapple;
 
-extern crate rocket_contrib;
 extern crate rocket;
-extern crate serde;
-#[macro_use] extern crate serde_derive;
 extern crate serde_json;
 extern crate serde_yaml;
-extern crate git2;
-extern crate hex;
-
-pub mod webhook;
-pub mod config;
-pub mod git_repository;
-pub mod github;
-pub mod errors;
-
-use config::Config;
 
 use std::fs::File;
 use std::io::prelude::*;
-use errors::*;
 
-use webhook::Webhook;
+use grapple::config::Config;
+use grapple::errors::*;
+use grapple::webhook::Webhook;
+use grapple::github;
+use grapple::git_repository;
 
 #[get("/")]
 fn index() -> &'static str {
