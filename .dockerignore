@@ -1,0 +1,9 @@
+target
+**/*.rs.bk
+
+# editor specific files
+.vscode/
+
+# app specific files (for testing)
+config.json
+config.yaml
