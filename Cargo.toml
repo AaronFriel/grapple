@@ -17,8 +17,8 @@ serde_yaml = "0.7.*"
 hex = "*"
 github_webhook_message_validator = "*"
 error-chain = "0.10.*"
-# git2 = "0.6.*"
-git2 = { git = "https://github.com/alexcrichton/git2-rs.git", rev = "f1ef0f92288c3316c69d8fe0a4db6219cab830d0" }
+git2 = "0.6.*"
+# git2 = { git = "https://github.com/alexcrichton/git2-rs.git" }
 clippy = {version = "*", optional = true}
 
 [features]

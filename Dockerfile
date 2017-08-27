@@ -1,12 +1,12 @@
 FROM liuchong/rustup:nightly
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates zlib1g-dev libc6 libgcc1 cmake libssh2-1-dev git
+
 WORKDIR /build
 ADD . /build
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates zlib1g-dev libc6 libgcc1 cmake
-
-RUN cargo build --release
+RUN cargo build --release --verbose
 
 # # Production build:
 FROM ubuntu
