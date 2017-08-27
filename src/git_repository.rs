@@ -1,6 +1,6 @@
 use errors::*;
 
-use git2::{Repository, Remote, PushOptions, RemoteCallbacks, Cred};
+use git2::{Repository, RepositoryInitOptions, Remote, PushOptions, RemoteCallbacks, Cred};
 use std::path::{Path};
 use std::fs::{self};
 
@@ -36,12 +36,22 @@ fn attempt_open<T: GitRepository>(repo: &T, attempts: u8) -> Result<Repository> 
             }
         } else {
             fs::remove_file(path)
-                .chain_err(|| Error::from_kind(ErrorKind::RepositoryOpenError))?;;
+                .chain_err(|| Error::from_kind(ErrorKind::RepositoryOpenError))?;
             return attempt_open(repo, attempts-1);
         }
     }
 
-    Ok(Repository::clone(repo.clone_uri(), path)?)
+    let mut repo_opts = RepositoryInitOptions::new();
+    repo_opts
+        .bare(true)
+        .no_reinit(true)
+        .no_dotgit_dir(false)
+        .mkdir(true)
+        .mkpath(true);
+
+    // let repo = init_bare(repo.repository_name())
+
+    Ok(Repository::init_opts(repo.repository_name(), &repo_opts)?)
 }
 
 const ALL_HEADS: &'static str = "+refs/heads/*:refs/heads/*";
@@ -88,7 +98,7 @@ fn open_remote_push<'a>(repo: &'a Repository, uri: &str) -> Result<Remote<'a>> {
 }
 
 fn push_glob(repository: &Repository, remote: &mut Remote, glob: &str, push_options: Option<&mut PushOptions>) -> Result<()> {
-    let refs = repository.references_glob(glob)?;
+    let mut refs = repository.references_glob(glob)?;
 
     let mut push_refs : Vec<&str> = Vec::new();
 
@@ -98,15 +108,15 @@ fn push_glob(repository: &Repository, remote: &mut Remote, glob: &str, push_opti
         }
     }
 
-    remote.push(&push_refs, push_options)?;
+    for name in &push_refs {
+        println!("{:?}", name);
+    }
 
     Ok(())
 }
 
 pub fn grapple<T: GitRepository>(payload: &T, mapping: &RepositoryMapping) -> Result<()> {
     let repo = open(payload)?;
-
-    disconnect_head(&repo)?;
 
     let mut fetch = open_remote_fetch(&repo, payload.clone_uri())?;
 
