@@ -11,6 +11,9 @@ RUN cargo build --release --verbose
 # # Production build:
 FROM ubuntu
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates libssl1.0.2
+
 WORKDIR /var/lib/grapple
 ENV ROCKET_ENV=prod
 ENV ROCKET_PORT=8000
