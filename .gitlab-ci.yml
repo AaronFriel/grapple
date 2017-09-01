@@ -1,0 +1,29 @@
+image: registry.gitlab.frielforreal.com/global/docker:client
+
+services:
+  - registry.gitlab.frielforreal.com/global/docker:dind
+
+variables:
+  IMAGE_TEST: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+  IMAGE_RELEASE: $CI_REGISTRY_IMAGE:latest
+
+stages:
+  - build
+  - release
+
+before_script:
+  - docker info
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+
+build-image:
+  stage: build
+  script:
+    - docker build -t $IMAGE_TEST .
+    - docker push $IMAGE_TEST
+
+release-image:
+  stage: release
+  script:
+    - docker pull $IMAGE_TEST
+    - docker tag $IMAGE_TEST $IMAGE_RELEASE
+    - docker push $IMAGE_RELEASE
